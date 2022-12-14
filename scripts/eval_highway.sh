@@ -1,11 +1,11 @@
 #!/bin/bash
 export CUDA_VISIBLE_DEVICES=0
 
-PATH_TO_DATA=/h/xinji/projects/GLUE
+PATH_TO_DATA=../GLUE
 
 MODEL_TYPE=bert  # bert or roberta
 MODEL_SIZE=base  # base or large
-DATASET=MRPC  # SST-2, MRPC, RTE, QNLI, QQP, or MNLI
+DATASET=SST-2  # SST-2, MRPC, RTE, QNLI, QQP, or MNLI
 
 MODEL_NAME=${MODEL_TYPE}-${MODEL_SIZE}
 if [ $MODEL_TYPE = 'bert' ]
@@ -27,4 +27,4 @@ python -um examples.run_highway_glue \
   --eval_each_highway \
   --eval_highway \
   --overwrite_cache \
-  --per_gpu_eval_batch_size=1
+  --per_gpu_eval_batch_size=1 > SST_2_DeeBERT_eval.out

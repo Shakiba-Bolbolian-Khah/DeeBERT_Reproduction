@@ -49,6 +49,7 @@ PRETRAINED_VOCAB_FILES_MAP = {
         'distilroberta-base': "https://s3.amazonaws.com/models.huggingface.co/bert/distilroberta-base-vocab.json",
         'roberta-base-openai-detector': "https://s3.amazonaws.com/models.huggingface.co/bert/roberta-base-vocab.json",
         'roberta-large-openai-detector': "https://s3.amazonaws.com/models.huggingface.co/bert/roberta-large-vocab.json",
+        'kssteven/ibert-roberta-base': "https://huggingface.co/kssteven/ibert-roberta-base/raw/main/vocab.json",
     },
     'merges_file':
     {
@@ -58,6 +59,7 @@ PRETRAINED_VOCAB_FILES_MAP = {
         'distilroberta-base': "https://s3.amazonaws.com/models.huggingface.co/bert/distilroberta-base-merges.txt",
         'roberta-base-openai-detector': "https://s3.amazonaws.com/models.huggingface.co/bert/roberta-base-merges.txt",
         'roberta-large-openai-detector': "https://s3.amazonaws.com/models.huggingface.co/bert/roberta-large-merges.txt",
+        'kssteven/ibert-roberta-base':"https://huggingface.co/kssteven/ibert-roberta-base/raw/main/merges.txt",
     },
 }
 
@@ -68,6 +70,7 @@ PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
     'distilroberta-base': 512,
     'roberta-base-openai-detector': 512,
     'roberta-large-openai-detector': 512,
+    'kssteven/ibert-roberta-base': 514,
 }
 
 

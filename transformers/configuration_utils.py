@@ -118,6 +118,7 @@ class PretrainedConfig(object):
             assert unused_kwargs == {'foo': False}
 
         """
+
         cache_dir = kwargs.pop('cache_dir', None)
         force_download = kwargs.pop('force_download', False)
         proxies = kwargs.pop('proxies', None)
@@ -137,12 +138,12 @@ class PretrainedConfig(object):
                 msg = "Couldn't reach server at '{}' to download pretrained model configuration file.".format(
                         config_file)
             else:
-                msg = "Model name '{}' was not found in model name list ({}). " \
-                      "We assumed '{}' was a path or url to a configuration file named {} or " \
+                msg = "Model name ---'{}'--- was not found in model name list ---({})---. " \
+                      "We assumed ---'{}'--- was a path or url to a configuration file named ---{}--- or " \
                       "a directory containing such a file but couldn't find any such file at this path or url.".format(
-                        pretrained_model_name_or_path,
-                        ', '.join(cls.pretrained_config_archive_map.keys()),
-                        config_file, CONFIG_NAME)
+                        config_file,
+                        cls,
+                        pretrained_model_name_or_path, cls.pretrained_config_archive_map)
             raise EnvironmentError(msg)
 
         if resolved_config_file == config_file:

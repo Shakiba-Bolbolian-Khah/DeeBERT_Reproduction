@@ -446,5 +446,4 @@ class BertForSequenceClassification(BertPreTrainedModel):
                 outputs = (outputs[0],) +\
                           (highway_logits_all[output_layer],) +\
                           outputs[2:]  ## use the highway of the last layer
-
         return outputs  # (loss), logits, (hidden_states), (attentions), (entropies), (exit_layer)

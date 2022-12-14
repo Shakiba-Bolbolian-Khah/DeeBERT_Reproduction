@@ -47,10 +47,14 @@ from transformers import (WEIGHTS_NAME, BertConfig,
                                   XLNetTokenizer,
                                   DistilBertConfig,
                                   DistilBertForSequenceClassification,
-                                  DistilBertTokenizer)
+                                  DistilBertTokenizer,
+                                  IBertConfig,
+                                  IBertForSequenceClassification)
 
 from transformers.modeling_highway_bert import BertForSequenceClassification
 from transformers.modeling_highway_roberta import RobertaForSequenceClassification
+from transformers.modeling_highway_ibert import IBertForSequenceClassification
+
 
 from transformers import AdamW, get_linear_schedule_with_warmup
 
@@ -62,14 +66,15 @@ from transformers import glue_convert_examples_to_features as convert_examples_t
 logger = logging.getLogger(__name__)
 
 ALL_MODELS = sum((tuple(conf.pretrained_config_archive_map.keys()) for conf in (BertConfig, XLNetConfig, XLMConfig,
-                                                                                RobertaConfig, DistilBertConfig)), ())
+                                                                                RobertaConfig, DistilBertConfig, IBertConfig)), ())
 
 MODEL_CLASSES = {
     'bert': (BertConfig, BertForSequenceClassification, BertTokenizer),
     'xlnet': (XLNetConfig, XLNetForSequenceClassification, XLNetTokenizer),
     'xlm': (XLMConfig, XLMForSequenceClassification, XLMTokenizer),
     'roberta': (RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer),
-    'distilbert': (DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer)
+    'distilbert': (DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer),
+    'ibert-roberta': (IBertConfig, IBertForSequenceClassification, RobertaTokenizer)
 }
 
 
@@ -151,14 +156,14 @@ def train(args, train_dataset, model, tokenizer, train_highway=False):
                                                           find_unused_parameters=True)
 
     # Train!
-    logger.info("***** Running training *****")
-    logger.info("  Num examples = %d", len(train_dataset))
-    logger.info("  Num Epochs = %d", args.num_train_epochs)
-    logger.info("  Instantaneous batch size per GPU = %d", args.per_gpu_train_batch_size)
-    logger.info("  Total train batch size (w. parallel, distributed & accumulation) = %d",
+    print("***** Running training *****")
+    print("  Num examples = %d", len(train_dataset))
+    print("  Num Epochs = %d", args.num_train_epochs)
+    print("  Instantaneous batch size per GPU = %d", args.per_gpu_train_batch_size)
+    print("  Total train batch size (w. parallel, distributed & accumulation) = %d",
                    args.train_batch_size * args.gradient_accumulation_steps * (torch.distributed.get_world_size() if args.local_rank != -1 else 1))
-    logger.info("  Gradient Accumulation steps = %d", args.gradient_accumulation_steps)
-    logger.info("  Total optimization steps = %d", t_total)
+    print("  Gradient Accumulation steps = %d", args.gradient_accumulation_steps)
+    print("  Total optimization steps = %d", t_total)
 
     global_step = 0
     tr_loss, logging_loss = 0.0, 0.0
@@ -220,7 +225,7 @@ def train(args, train_dataset, model, tokenizer, train_highway=False):
                     model_to_save = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
                     model_to_save.save_pretrained(output_dir)
                     torch.save(args, os.path.join(output_dir, 'training_args.bin'))
-                    logger.info("Saving model checkpoint to %s", output_dir)
+                    print("Saving model checkpoint to %s", output_dir)
 
             if args.max_steps > 0 and global_step > args.max_steps:
                 epoch_iterator.close()
@@ -257,9 +262,9 @@ def evaluate(args, model, tokenizer, prefix="", output_layer=-1, eval_highway=Fa
             model = torch.nn.DataParallel(model)
 
         # Eval!
-        logger.info("***** Running evaluation {} *****".format(prefix))
-        logger.info("  Num examples = %d", len(eval_dataset))
-        logger.info("  Batch size = %d", args.eval_batch_size)
+        print("***** Running evaluation {} *****".format(prefix))
+        print("  Num examples = %d", len(eval_dataset))
+        print("  Batch size = %d", args.eval_batch_size)
         eval_loss = 0.0
         nb_eval_steps = 0
         preds = None
@@ -279,8 +284,15 @@ def evaluate(args, model, tokenizer, prefix="", output_layer=-1, eval_highway=Fa
                 if output_layer >= 0:
                     inputs['output_layer'] = output_layer
                 outputs = model(**inputs)
+                
                 if eval_highway:
                     exit_layer_counter[outputs[-1]] += 1
+
+                # logits = outputs[3][0]
+
+                # tmp_eval_loss = outputs[0]
+                
+                # raise ValueError(outputs, '----', tmp_eval_loss, '-------', len(logits[0]), '----', logits[0][0], '#####', type(logits))
                 tmp_eval_loss, logits = outputs[:2]
 
                 eval_loss += tmp_eval_loss.mean().item()
@@ -322,9 +334,9 @@ def evaluate(args, model, tokenizer, prefix="", output_layer=-1, eval_highway=Fa
 
         output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt")
         with open(output_eval_file, "w") as writer:
-            logger.info("***** Eval results {} *****".format(prefix))
+            print("***** Eval results {} *****".format(prefix))
             for key in sorted(result.keys()):
-                logger.info("  %s = %s", key, str(result[key]))
+                print("  %s = %s", key, str(result[key]))
                 writer.write("%s = %s\n" % (key, str(result[key])))
 
     return results
@@ -343,10 +355,10 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
         str(args.max_seq_length),
         str(task)))
     if os.path.exists(cached_features_file) and not args.overwrite_cache:
-        logger.info("Loading features from cached file %s", cached_features_file)
+        print("Loading features from cached file %s", cached_features_file)
         features = torch.load(cached_features_file)
     else:
-        logger.info("Creating features from dataset file at %s", args.data_dir)
+        print("Creating features from dataset file at %s", args.data_dir)
         label_list = processor.get_labels()
         if task in ['mnli', 'mnli-mm'] and args.model_type in ['roberta']:
             # HACK(label indices are swapped in RoBERTa pretrained model)
@@ -362,7 +374,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
                                                 pad_token_segment_id=4 if args.model_type in ['xlnet'] else 0,
         )
         if args.local_rank in [-1, 0]:
-            logger.info("Saving features into cached file %s", cached_features_file)
+            print("Saving features into cached file %s", cached_features_file)
             torch.save(features, cached_features_file)
 
     if args.local_rank == 0 and not evaluate:
@@ -384,6 +396,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
 def main():
     parser = argparse.ArgumentParser()
 
+    print('here')
     ## Required parameters
     parser.add_argument("--data_dir", default=None, type=str, required=True,
                         help="The input data dir. Should contain the .tsv files (or other data files) for the task.")
@@ -496,9 +509,10 @@ def main():
     args.device = device
 
     # Setup logging
-    logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                        datefmt = '%m/%d/%Y %H:%M:%S',
-                        level = logging.INFO if args.local_rank in [-1, 0] else logging.WARN)
+    logging.root.setLevel(logging.WARN)
+    logging.basicConfig(filename='output_highway.log', format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
+                        datefmt = '%m/%d/%Y %H:%M:%S', filemode='w',
+                        level = logging.WARN)
     logger.warning("Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, 16-bits training: %s",
                     args.local_rank, device, args.n_gpu, bool(args.local_rank != -1), args.fp16)
 
@@ -515,19 +529,31 @@ def main():
     num_labels = len(label_list)
 
     # Load pretrained model and tokenizer
+    
     if args.local_rank not in [-1, 0]:
         torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
 
     args.model_type = args.model_type.lower()
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
+
+    
+    
+
+
     config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path,
                                           num_labels=num_labels,
                                           finetuning_task=args.task_name,
                                           cache_dir=args.cache_dir if args.cache_dir else None)
+
+    
+
     tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
                                                 do_lower_case=args.do_lower_case,
                                                 cache_dir=args.cache_dir if args.cache_dir else None)
-    model = model_class.from_pretrained(args.model_name_or_path,
+
+    # raise ValueError(config_class, IBertForSequenceClassification.from_pretrained("kssteven/ibert-roberta-base"), tokenizer_class, tokenizer)
+    
+    model =  model_class.from_pretrained(args.model_name_or_path,
                                         from_tf=bool('.ckpt' in args.model_name_or_path),
                                         config=config,
                                         cache_dir=args.cache_dir if args.cache_dir else None)
@@ -535,23 +561,26 @@ def main():
     if args.model_type == "bert":
         model.bert.encoder.set_early_exit_entropy(args.early_exit_entropy)
         model.bert.init_highway_pooler()
-    else:
+    elif args.model_type == "roberta":
         model.roberta.encoder.set_early_exit_entropy(args.early_exit_entropy)
         model.roberta.init_highway_pooler()
+    else:
+        model.ibert.encoder.set_early_exit_entropy(args.early_exit_entropy)
+        model.ibert.init_highway_pooler()
 
     if args.local_rank == 0:
         torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
 
     model.to(args.device)
 
-    logger.info("Training/evaluation parameters %s", args)
+    print("Training/evaluation parameters %s", args)
 
 
     # Training
     if args.do_train:
         train_dataset = load_and_cache_examples(args, args.task_name, tokenizer, evaluate=False)
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
-        logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
+        print(" global_step = %s, average loss = %s", global_step, tr_loss)
 
         if args.eval_after_first_stage:
             result = evaluate(args, model, tokenizer, prefix="")
@@ -566,7 +595,7 @@ def main():
         if not os.path.exists(args.output_dir) and args.local_rank in [-1, 0]:
             os.makedirs(args.output_dir)
 
-        logger.info("Saving model checkpoint to %s", args.output_dir)
+        print("Saving model checkpoint to %s", args.output_dir)
         # Save a trained model, configuration and tokenizer using `save_pretrained()`.
         # They can then be reloaded using `from_pretrained()`
         model_to_save = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
@@ -590,7 +619,7 @@ def main():
         if args.eval_all_checkpoints:
             checkpoints = list(os.path.dirname(c) for c in sorted(glob.glob(args.output_dir + '/**/' + WEIGHTS_NAME, recursive=True)))
             logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce logging
-        logger.info("Evaluate the following checkpoints: %s", checkpoints)
+        print("Evaluate the following checkpoints: %s", checkpoints)
         for checkpoint in checkpoints:
             global_step = checkpoint.split('-')[-1] if len(checkpoints) > 1 else ""
             prefix = checkpoint.split('/')[-1] if checkpoint.find('checkpoint') != -1 else ""
@@ -598,8 +627,10 @@ def main():
             model = model_class.from_pretrained(checkpoint)
             if args.model_type=="bert":
                 model.bert.encoder.set_early_exit_entropy(args.early_exit_entropy)
-            else:
+            elif args.model_type=="roberta":
                 model.roberta.encoder.set_early_exit_entropy(args.early_exit_entropy)
+            else:
+                model.ibert.encoder.set_early_exit_entropy(args.early_exit_entropy)
             model.to(args.device)
             result = evaluate(args, model, tokenizer, prefix=prefix,
                               eval_highway=args.eval_highway)
@@ -609,7 +640,7 @@ def main():
                 last_layer_results = print_result
                 each_layer_results = []
                 for i in range(model.num_layers):
-                    logger.info("\n")
+                    print("\n")
                     _result = evaluate(args, model, tokenizer, prefix=prefix,
                                        output_layer=i, eval_highway=args.eval_highway)
                     if i+1 < model.num_layers:
@@ -622,6 +653,7 @@ def main():
                         np.array(each_layer_results))
             result = dict((k + '_{}'.format(global_step), v) for k, v in result.items())
             results.update(result)
+            print(results)
 
     return results
 

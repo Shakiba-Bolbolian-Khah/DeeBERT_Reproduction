@@ -1,0 +1,16 @@
+0.01
+Training/evaluation parameters %s Namespace(adam_epsilon=1e-08, cache_dir='', config_name='', data_dir='../GLUE/SST-2', device=device(type='cuda'), do_eval=True, do_lower_case=True, do_train=False, early_exit_entropy=0.01, eval_after_first_stage=False, eval_all_checkpoints=False, eval_each_highway=False, eval_highway=True, evaluate_during_training=False, fp16=False, fp16_opt_level='O1', gradient_accumulation_steps=1, learning_rate=5e-05, local_rank=-1, logging_steps=50, max_grad_norm=1.0, max_seq_length=128, max_steps=-1, model_name_or_path='./saved_models/bert-base/SST-2/two_stage', model_type='bert', n_gpu=1, no_cuda=False, num_train_epochs=3.0, output_dir='./saved_models/bert-base/SST-2/two_stage', output_mode='classification', overwrite_cache=True, overwrite_output_dir=False, per_gpu_eval_batch_size=1, per_gpu_train_batch_size=8, plot_data_dir='./plotting/', save_steps=50, seed=42, server_ip='', server_port='', task_name='sst-2', tokenizer_name='', warmup_steps=0, weight_decay=0.0)
+Evaluate the following checkpoints: %s ['./saved_models/bert-base/SST-2/two_stage']
+0.01
+Creating features from dataset file at %s ../GLUE/SST-2
+Saving features into cached file %s ../GLUE/SST-2/cached_dev_two_stage_128_sst-2
+***** Running evaluation  *****
+  Num examples = %d 872
+  Batch size = %d 1
+Eval time: 12.764261484146118
+Exit layer counter {1: 0, 2: 3, 3: 15, 4: 22, 5: 19, 6: 52, 7: 76, 8: 176, 9: 232, 10: 76, 11: 24, 12: 177}
+Expected saving 0.7379587155963303
+***** Eval results  *****
+  %s = %s acc 0.9311926605504587
+Result: 0.9311926605504587
+{'acc_': 0.9311926605504587}

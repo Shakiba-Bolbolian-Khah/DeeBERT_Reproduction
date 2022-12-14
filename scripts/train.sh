@@ -1,14 +1,14 @@
 #!/bin/bash
 export CUDA_VISIBLE_DEVICES=0
 
-PATH_TO_DATA=/h/xinji/projects/GLUE
+PATH_TO_DATA=../GLUE
 
-MODEL_TYPE=bert  # bert or roberta
+MODEL_TYPE=ibert-roberta  # bert or roberta
 MODEL_SIZE=base  # base or large
 DATASET=MRPC  # SST-2, MRPC, RTE, QNLI, QQP, or MNLI
 
 MODEL_NAME=${MODEL_TYPE}-${MODEL_SIZE}
-EPOCHS=10
+EPOCHS=1
 if [ $MODEL_TYPE = 'bert' ]
 then
   EPOCHS=3
@@ -18,9 +18,11 @@ fi
 
 python -um examples.run_glue \
   --model_type $MODEL_TYPE \
-  --model_name_or_path $MODEL_NAME \
+  --model_name_or_path kssteven/ibert-roberta-base \
   --task_name $DATASET \
   --do_train \
+  --eval_all_checkpoints \
+  --save_steps 2\
   --do_eval \
   --do_lower_case \
   --data_dir $PATH_TO_DATA/$DATASET \
@@ -33,4 +35,4 @@ python -um examples.run_glue \
   --seed 42 \
   --output_dir ./saved_models/${MODEL_TYPE}-${MODEL_SIZE}/$DATASET/raw \
   --overwrite_cache \
-  --overwrite_output_dir
+  --overwrite_output_dir > MRPC_IBERT_3epoch.out

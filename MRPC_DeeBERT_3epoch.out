@@ -1,0 +1,43 @@
+here
+Namespace(adam_epsilon=1e-08, cache_dir='', config_name='', data_dir='../GLUE/MRPC', do_eval=True, do_lower_case=True, do_train=True, early_exit_entropy=-1, eval_after_first_stage=True, eval_all_checkpoints=True, eval_each_highway=False, eval_highway=False, evaluate_during_training=False, fp16=False, fp16_opt_level='O1', gradient_accumulation_steps=1, learning_rate=2e-05, local_rank=-1, logging_steps=50, max_grad_norm=1.0, max_seq_length=128, max_steps=-1, model_name_or_path='kssteven/ibert-roberta-base', model_type='ibert-roberta', no_cuda=False, num_train_epochs=3.0, output_dir='./saved_models/ibert-roberta/MRPC/two_stage', overwrite_cache=True, overwrite_output_dir=True, per_gpu_eval_batch_size=1, per_gpu_train_batch_size=8, plot_data_dir='./plotting/', save_steps=0, seed=42, server_ip='', server_port='', task_name='MRPC', tokenizer_name='RobertaTokenizer', warmup_steps=0, weight_decay=0.0)
+**************************************************
+kssteven/ibert-roberta-base
+ibert-roberta
+<class 'transformers.configuration_ibert.IBertConfig'> <class 'transformers.modeling_highway_ibert.IBertForSequenceClassification'> <class 'transformers.tokenization_roberta.RobertaTokenizer'>
+
+{
+  "architectures": [
+    "IBertForMaskedLM"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "eos_token_id": 2,
+  "finetuning_task": "mrpc",
+  "force_dequant": "none",
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "layer_norm_eps": 1e-05,
+  "max_position_embeddings": 514,
+  "model_type": "ibert",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "num_labels": 2,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 1,
+  "position_embedding_type": "absolute",
+  "pruned_heads": {},
+  "quant_mode": false,
+  "tokenizer_class": "RobertaTokenizer",
+  "torchscript": false,
+  "type_vocab_size": 1,
+  "use_bfloat16": false,
+  "vocab_size": 50265
+}
+
+**************************************************

@@ -1,0 +1,21 @@
+Training/evaluation parameters %s Namespace(adam_epsilon=1e-08, cache_dir='', config_name='', data_dir='../GLUE/QNLI', device=device(type='cuda'), do_eval=True, do_lower_case=True, do_train=True, eval_all_checkpoints=True, evaluate_during_training=False, fp16=False, fp16_opt_level='O1', gradient_accumulation_steps=1, learning_rate=2e-05, local_rank=-1, logging_steps=50, max_grad_norm=1.0, max_seq_length=128, max_steps=-1, model_name_or_path='bert-base-uncased', model_type='bert', n_gpu=1, no_cuda=False, num_train_epochs=3.0, output_dir='./saved_models/bert-base/QNLI/raw', output_mode='classification', overwrite_cache=True, overwrite_output_dir=True, per_gpu_eval_batch_size=1, per_gpu_train_batch_size=8, save_steps=0, seed=42, server_ip='', server_port='', task_name='qnli', tokenizer_name='', warmup_steps=0, weight_decay=0.0)
+Creating features from dataset file at %s ../GLUE/QNLI
+Saving features into cached file %s ../GLUE/QNLI/cached_train_bert-base-uncased_128_qnli
+***** Running training *****
+  Num examples = %d 104743
+  Num Epochs = %d 3.0
+  Instantaneous batch size per GPU = %d 8
+  Total train batch size (w. parallel, distributed & accumulation) = %d 8
+  Gradient Accumulation steps = %d 1
+  Total optimization steps = %d 39279.0
+ global_step = %s, average loss = %s 39279 0.24773591249551524
+Saving model checkpoint to %s ./saved_models/bert-base/QNLI/raw
+Evaluate the following checkpoints: %s ['./saved_models/bert-base/QNLI/raw']
+Creating features from dataset file at %s ../GLUE/QNLI
+Saving features into cached file %s ../GLUE/QNLI/cached_dev_bert-base-uncased_128_qnli
+***** Running evaluation  *****
+  Num examples = %d 5463
+  Batch size = %d 1
+Eval time: 64.8211772441864
+***** Eval results  *****
+  %s = %s acc 0.9125022881200805

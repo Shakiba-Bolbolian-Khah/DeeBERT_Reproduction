@@ -44,6 +44,7 @@ from .tokenization_roberta import RobertaTokenizer
 from .tokenization_distilbert import DistilBertTokenizer
 from .tokenization_camembert import CamembertTokenizer
 
+
 # Configurations
 from .configuration_utils import PretrainedConfig
 from .configuration_auto import AutoConfig
@@ -58,6 +59,7 @@ from .configuration_xlm import XLMConfig, XLM_PRETRAINED_CONFIG_ARCHIVE_MAP
 from .configuration_roberta import RobertaConfig, ROBERTA_PRETRAINED_CONFIG_ARCHIVE_MAP
 from .configuration_distilbert import DistilBertConfig, DISTILBERT_PRETRAINED_CONFIG_ARCHIVE_MAP
 from .configuration_camembert import CamembertConfig, CAMEMBERT_PRETRAINED_CONFIG_ARCHIVE_MAP
+from .configuration_ibert import IBertConfig, IBERT_PRETRAINED_CONFIG_ARCHIVE_MAP
 
 # Modeling
 if is_torch_available():
@@ -103,6 +105,10 @@ if is_torch_available():
                                 CamembertForTokenClassification,
                                 CAMEMBERT_PRETRAINED_MODEL_ARCHIVE_MAP)
     from .modeling_encoder_decoder import PreTrainedEncoderDecoder, Model2Model
+
+    from .modeling_ibert import (IBertModel, IBertForQuestionAnswering, IBertClassificationHead, 
+                                IBertForTokenClassification, IBertForMultipleChoice,
+                                IBertForSequenceClassification, IBertForMaskedLM)
 
     # Optimization
     from .optimization import (AdamW, get_constant_schedule, get_constant_schedule_with_warmup, get_cosine_schedule_with_warmup,

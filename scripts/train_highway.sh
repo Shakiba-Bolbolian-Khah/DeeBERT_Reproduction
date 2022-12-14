@@ -1,13 +1,13 @@
 #!/bin/bash
 export CUDA_VISIBLE_DEVICES=0
 
-PATH_TO_DATA=/h/xinji/projects/GLUE
+PATH_TO_DATA=../GLUE
 
-MODEL_TYPE=bert  # bert or roberta
+MODEL_TYPE=bert  # bert or roberta or ibert-roberta
 MODEL_SIZE=base  # base or large
 DATASET=MRPC  # SST-2, MRPC, RTE, QNLI, QQP, or MNLI
 
-MODEL_NAME=${MODEL_TYPE}-${MODEL_SIZE}
+MODEL_NAME=${MODEL_TYPE}-${MODEL_SIZE} # or kssteven/ibert-roberta-base for i-bert
 EPOCHS=10
 if [ $MODEL_TYPE = 'bert' ]
 then
@@ -21,6 +21,8 @@ python -um examples.run_highway_glue \
   --model_name_or_path $MODEL_NAME \
   --task_name $DATASET \
   --do_train \
+  --eval_all_checkpoints \
+  --save_steps 115\
   --do_eval \
   --do_lower_case \
   --data_dir $PATH_TO_DATA/$DATASET \
@@ -35,4 +37,5 @@ python -um examples.run_highway_glue \
   --plot_data_dir ./plotting/ \
   --save_steps 0 \
   --overwrite_cache \
-  --eval_after_first_stage
+  --eval_after_first_stage > MRPC_RoBERTa_10epoch.out
+
