@@ -1,4 +1,4 @@
-# DeeBERT
+# DeeBERT and its Fusion with I-BERT
 
 This is the code base for the paper [DeeBERT: Dynamic Early Exiting for Accelerating BERT Inference](https://www.aclweb.org/anthology/2020.acl-main.204/).
 
