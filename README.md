@@ -50,7 +50,11 @@ This is for evaluating each exit layer for fine-tuned DeeBERT models.
 
 #### eval_entropy.sh
 
-This is for evaluating fine-tuned DeeBERT models, given a number of different early exit entropy thresholds.
+This is for evaluating fine-tuned DeeBERT models, given a number of different early exit entropy thresholds. To evaluate I-BERT model, set quant_mode to true in the saved model's configuration to enable quantization in inference time.
+
+#### transformers/modeling_highway_xxx.py
+
+You can find the implementation for DeeBERT acceleration of BERT, RoBERTa, and I-BERT in their corresponding files.
 
 
 
